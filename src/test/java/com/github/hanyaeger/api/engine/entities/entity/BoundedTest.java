@@ -25,6 +25,7 @@ class BoundedTest {
         sut = new BoundedImpl();
         sut.setNode(node);
         when(node.getBoundsInLocal()).thenReturn(bounds);
+        when(node.getBoundsInParent()).thenReturn(bounds);
     }
 
     @Test
@@ -59,7 +60,7 @@ class BoundedTest {
         var sut = new EmptyGameNodeBoundedImpl();
 
         // Act
-        var boundingBox = sut.getTransformedBounds();
+        var boundingBox = sut.getBoundingBox();
 
         // Assert
         Assertions.assertEquals(0, boundingBox.getWidth());
@@ -73,7 +74,7 @@ class BoundedTest {
         sut.setNode(node);
 
         // Act
-        sut.getTransformedBounds();
+        sut.getBoundingBox();
 
         // Assert
         Mockito.verify(node).getBoundsInParent();
@@ -104,84 +105,6 @@ class BoundedTest {
         // Assert
         Mockito.verify(node).localToScene(any(Bounds.class), eq(true));
         Mockito.verify(node).getBoundsInLocal();
-    }
-
-    @Test
-    void getLeftXReturnValueFromBounds() {
-        // Arrange
-        var minX = 0.37;
-        when(bounds.getMinX()).thenReturn(minX);
-
-        // Act
-        double leftSideX = sut.getLeftX();
-
-        // Assert
-        Assertions.assertEquals(minX, leftSideX);
-    }
-
-    @Test
-    void getRightXReturnValueFromBounds() {
-        // Arrange
-        var maxX = 0.42;
-        when(bounds.getMaxX()).thenReturn(maxX);
-
-        // Act
-        double rightSideX = sut.getRightX();
-
-        // Assert
-        Assertions.assertEquals(maxX, rightSideX);
-    }
-
-    @Test
-    void getCenterXReturnValueFromBounds() {
-        // Arrange
-        var centerX = 0.24;
-        when(bounds.getCenterX()).thenReturn(centerX);
-
-        // Act
-        double returnedCenterX = sut.getCenterX();
-
-        // Assert
-        Assertions.assertEquals(centerX, returnedCenterX);
-    }
-
-    @Test
-    void getTopYReturnValueFromBounds() {
-        // Arrange
-        var minY = 0.37;
-        when(bounds.getMinY()).thenReturn(minY);
-
-        // Act
-        double topSideY = sut.getTopY();
-
-        // Assert
-        Assertions.assertEquals(minY, topSideY);
-    }
-
-    @Test
-    void getBottomYReturnValueFromBounds() {
-        // Arrange
-        var minY = 0.42;
-        when(bounds.getMaxY()).thenReturn(minY);
-
-        // Act
-        double bottomY = sut.getBottomY();
-
-        // Assert
-        Assertions.assertEquals(minY, bottomY);
-    }
-
-    @Test
-    void getCenterYReturnValueFromBounds() {
-        // Arrange
-        var centerY = 0.23;
-        when(bounds.getCenterY()).thenReturn(centerY);
-
-        // Act
-        double returnedCenterY = sut.getCenterY();
-
-        // Assert
-        Assertions.assertEquals(centerY, returnedCenterY);
     }
 
     @Test

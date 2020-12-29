@@ -9,20 +9,24 @@ import java.util.Optional;
  * A {@link MotionApplier} is an implementation of {@link MotionApplier} that does not abide
  * the laws of Physics and only provides basis behaviour regarding speed and direction.
  */
-public class MotionApplier implements MotionModifier, LocationUpdater {
+public class MotionApplier implements MotionModifier, NewtonianModifier, LocationUpdater {
 
-    private static final Point2D ZERO_ANGLE_IDENTITY_MOTION = new Point2D(0, 1);
+    private static final Point2D IDENTITY_MOTION = new Point2D(0, 1);
+    private static final Point2D NON_MOTION = new Point2D(0, 0);
     private Optional<Double> direction = Optional.empty();
     private Coordinate2D motion;
     private Optional<Coordinate2D> previousLocation = Optional.empty();
     private boolean halted = false;
 
     public static final double DEFAULT_GRAVITATIONAL_CONSTANT = 0.2d;
+    public static final double DEFAULT_FRICTION_CONSTANT = 0.01d;
     public static final double DEFAULT_GRAVITATIONAL_DIRECTION = Direction.DOWN.getValue();
+
+    private double frictionConstant = DEFAULT_FRICTION_CONSTANT;
     private double gravityConstant = DEFAULT_GRAVITATIONAL_CONSTANT;
     private double gravityDirection = DEFAULT_GRAVITATIONAL_DIRECTION;
 
-    private boolean gravitationalPull = true;
+    private boolean gravitationalPull = false;
 
     /**
      * Create a new instance of {@link MotionApplier}.
@@ -42,14 +46,11 @@ public class MotionApplier implements MotionModifier, LocationUpdater {
         setMotion(speed, direction.getValue());
     }
 
-
-    // TODO unittest
     @Override
     public void addToMotion(final double speed, final Direction direction) {
         addToMotion(speed, direction.getValue());
     }
 
-    // TODO unittest
     @Override
     public void addToMotion(final double speed, final double direction) {
         motion = motion.add(createVector(speed, direction));
@@ -60,16 +61,20 @@ public class MotionApplier implements MotionModifier, LocationUpdater {
         hasBeenHalted(newSpeed);
 
         if (Double.compare(newSpeed, 0d) == 0) {
-            this.direction = Optional.of(motion.angle(new Point2D(0, 1)));
+            if (NON_MOTION.equals(this.motion)) {
+                this.direction = Optional.of(Direction.DOWN.getValue());
+            } else {
+                this.direction = Optional.of(this.motion.angle(new Point2D(0, 1)));
+            }
         }
 
-        if (motion.equals(new Coordinate2D(0, 0))) {
-            motion = new Coordinate2D(0, newSpeed);
+        if (this.motion.equals(new Coordinate2D(0, 0))) {
+            this.motion = new Coordinate2D(0, newSpeed);
         } else {
-            motion = new Coordinate2D((motion.normalize().multiply(newSpeed)));
+            this.motion = new Coordinate2D((this.motion.normalize().multiply(newSpeed)));
         }
 
-        direction.ifPresent(this::setDirection);
+        this.direction.ifPresent(this::setDirection);
     }
 
     @Override
@@ -87,50 +92,42 @@ public class MotionApplier implements MotionModifier, LocationUpdater {
         }
     }
 
-    /**
-     * TODO unittest
-     * Return the gravitational contant used by this {@link NewtonianMotionApplier}.
-     *
-     * @return the gravitational constant as a {@code double}
-     */
-    public double getGravityConstant() {
-        return gravityConstant;
+    @Override
+    public void setFrictionConstant(final double frictionConstant) {
+        this.frictionConstant = frictionConstant;
     }
 
-    /**
-     * TODO unittest
-     * Set the gravitational contant used by this {@link NewtonianMotionApplier}.
-     *
-     * @param gravityConstant the gravitational constant as a {@code double}
-     */
+    @Override
+    public double getFrictionConstant() {
+        return frictionConstant;
+    }
+
+    @Override
     public void setGravityConstant(double gravityConstant) {
         this.gravityConstant = gravityConstant;
     }
 
-    /**
-     * TODO unittest
-     * Return the gravitational direction used by this {@link NewtonianMotionApplier}.
-     *
-     * @return the gravitational direction as a {@code double}
-     */
-    public double getGravityDirection() {
-        return gravityDirection;
+    @Override
+    public double getGravityConstant() {
+        return gravityConstant;
     }
 
-    /**
-     * TODO unittest
-     * Set the gravitational direction used by this {@link NewtonianMotionApplier}.
-     *
-     * @param gravityDirection the gravitational constant as a {@code double}
-     */
+    @Override
     public void setGravityDirection(double gravityDirection) {
         this.gravityDirection = gravityDirection;
     }
 
+    @Override
+    public double getGravityDirection() {
+        return gravityDirection;
+    }
+
+    @Override
     public void setGravitationalPull(final boolean pull) {
         this.gravitationalPull = pull;
     }
 
+    @Override
     public boolean isGravitationalPull() {
         return gravitationalPull;
     }
@@ -162,7 +159,7 @@ public class MotionApplier implements MotionModifier, LocationUpdater {
         if (direction.isPresent()) {
             return direction.get();
         } else {
-            double currentAngle = motion.angle(ZERO_ANGLE_IDENTITY_MOTION);
+            double currentAngle = motion.angle(IDENTITY_MOTION);
 
             if (motion.getX() < 0) {
                 currentAngle = 360 - currentAngle;
@@ -205,6 +202,8 @@ public class MotionApplier implements MotionModifier, LocationUpdater {
 
     /**
      * Return whether this {@link MotionApplier} has been halted.
+     *
+     * @return whether this {@link MotionApplier} has been halted
      */
     public boolean isHalted() {
         return halted;
