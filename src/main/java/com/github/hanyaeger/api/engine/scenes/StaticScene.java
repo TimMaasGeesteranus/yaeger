@@ -1,6 +1,7 @@
 package com.github.hanyaeger.api.engine.scenes;
 
 import com.github.hanyaeger.api.engine.DependencyInjector;
+import com.github.hanyaeger.api.engine.YaegerConfig;
 import com.github.hanyaeger.api.engine.debug.Debugger;
 import com.github.hanyaeger.api.engine.entities.tilemap.TileMap;
 import com.github.hanyaeger.api.engine.entities.tilemap.TileMapListProvider;
@@ -50,7 +51,9 @@ public abstract class StaticScene implements YaegerScene, SupplierProvider, Tile
     private Scene scene;
     private Pane pane;
     private ColorAdjust colorAdjust;
+    private YaegerConfig config;
     Debugger debugger;
+
 
     @Override
     public void init(final Injector injector) {
@@ -63,7 +66,7 @@ public abstract class StaticScene implements YaegerScene, SupplierProvider, Tile
 
         scene = sceneFactory.create(pane);
 
-        entityCollection = entityCollectionFactory.create(pane);
+        entityCollection = entityCollectionFactory.create(pane, config);
         injector.injectMembers(entityCollection);
         entityCollection.init(injector);
         entityCollection.addStatisticsObserver(debugger);
@@ -128,6 +131,11 @@ public abstract class StaticScene implements YaegerScene, SupplierProvider, Tile
     @Override
     public void setStage(final Stage stage) {
         this.stage = stage;
+    }
+
+    @Override
+    public void setConfig(final YaegerConfig yaegerConfig) {
+        this.config = yaegerConfig;
     }
 
     @Override

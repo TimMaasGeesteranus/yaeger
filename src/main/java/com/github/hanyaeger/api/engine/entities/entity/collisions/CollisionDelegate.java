@@ -15,7 +15,7 @@ public class CollisionDelegate {
     private final List<Collider> colliders;
 
     /**
-     * Create a new CollisionDelegate.
+     * Create a new {@link CollisionDelegate}.
      */
     public CollisionDelegate() {
         collideds = new ArrayList<>();
@@ -27,14 +27,21 @@ public class CollisionDelegate {
      * if is an {@link Collider} or {@link Collided}.
      *
      * @param entity the {@link YaegerEntity} that should be registered
+     * @return a {@code boolean} stated whether this {@link YaegerEntity} is either a {@link Collider} or a {@link Collided}
      */
-    public void register(final YaegerEntity entity) {
+    public boolean register(final YaegerEntity entity) {
+        var registered = false;
+
         if (entity instanceof Collider) {
             register((Collider) entity);
+            registered = true;
         }
         if (entity instanceof Collided) {
             register((Collided) entity);
+            registered = true;
         }
+
+        return registered;
     }
 
     /**

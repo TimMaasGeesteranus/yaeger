@@ -4,18 +4,17 @@ import com.github.hanyaeger.api.engine.Timer;
 import com.github.hanyaeger.api.engine.entities.entity.AnchorPoint;
 import com.github.hanyaeger.api.engine.entities.entity.Coordinate2D;
 import com.github.hanyaeger.api.engine.entities.entity.YaegerEntity;
-import com.github.hanyaeger.api.engine.entities.entity.motion.MotionApplier;
 import com.google.inject.Injector;
 import javafx.scene.Node;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
-import org.mockito.Mockito;
 
 import java.util.List;
 import java.util.Optional;
 
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 import static org.mockito.Mockito.mock;
 
 class CollisionDelegateTest {
@@ -31,10 +30,10 @@ class CollisionDelegateTest {
     void onlyCollidedGetsCollisionCheck() {
         // Arrange
         var collided = mock(Collided.class);
-        var AABBCollider = mock(Collider.class);
+        var collider = mock(Collider.class);
 
         collisionDelegate.register(collided);
-        collisionDelegate.register(AABBCollider);
+        collisionDelegate.register(collider);
 
         ArgumentCaptor<List> argument = ArgumentCaptor.forClass(List.class);
 
@@ -42,8 +41,44 @@ class CollisionDelegateTest {
         collisionDelegate.checkCollisions();
 
         // Assert
-        Mockito.verify(collided).checkForCollisions(argument.capture());
-        Assertions.assertEquals(1, argument.getValue().size());
+        verify(collided).checkForCollisions(argument.capture());
+        assertEquals(1, argument.getValue().size());
+    }
+
+    @Test
+    void nonColliderOrCollidedReturnsFalseOnRegister() {
+        // Act
+        var normalEntity = mock(YaegerEntity.class);
+
+        // Arrange
+        boolean register = collisionDelegate.register(normalEntity);
+
+        // Assert
+        assertFalse(register);
+    }
+
+    @Test
+    void colliderReturnsTrueOnRegister() {
+        // Act
+        YaegerEntity collider = mock(ColliderImpl.class);
+
+        // Arrange
+        boolean register = collisionDelegate.register(collider);
+
+        // Assert
+        assertTrue(register);
+    }
+
+    @Test
+    void collidedReturnsTrueOnRegister() {
+        // Act
+        YaegerEntity collided = mock(CollidedImpl.class);
+
+        // Arrange
+        boolean register = collisionDelegate.register(collided);
+
+        // Assert
+        assertTrue(register);
     }
 
     @Test
@@ -61,8 +96,8 @@ class CollisionDelegateTest {
         collisionDelegate.checkCollisions();
 
         // Assert
-        Mockito.verify((Collided) collidedEntity).checkForCollisions(argument.capture());
-        Assertions.assertEquals(1, argument.getValue().size());
+        verify((Collided) collidedEntity).checkForCollisions(argument.capture());
+        assertEquals(1, argument.getValue().size());
     }
 
     @Test
@@ -79,7 +114,7 @@ class CollisionDelegateTest {
         collisionDelegate.checkCollisions();
 
         // Assert
-        Mockito.verifyNoMoreInteractions(collidedEntity);
+        verifyNoMoreInteractions(collidedEntity);
     }
 
     @Test
@@ -98,8 +133,8 @@ class CollisionDelegateTest {
         collisionDelegate.checkCollisions();
 
         // Assert
-        Mockito.verify((Collided) collidedEntity).checkForCollisions(argument.capture());
-        Assertions.assertEquals(0, argument.getValue().size());
+        verify((Collided) collidedEntity).checkForCollisions(argument.capture());
+        assertEquals(0, argument.getValue().size());
     }
 
     private class CollidedImpl extends YaegerEntity implements Collided {
@@ -115,12 +150,12 @@ class CollisionDelegateTest {
 
         @Override
         public void onCollision(Collider collidingObject) {
-            // Not required here.
+            // Not required here
         }
 
         @Override
         public void remove() {
-            // Not required here.
+            // Not required here
         }
 
         @Override
@@ -130,7 +165,7 @@ class CollisionDelegateTest {
 
         @Override
         public void setAnchorPoint(AnchorPoint anchorPoint) {
-            // Not required here.
+            // Not required here
         }
 
         @Override
@@ -140,34 +175,17 @@ class CollisionDelegateTest {
 
         @Override
         public void transferCoordinatesToNode() {
-            // Not required here.
+            // Not required here
         }
 
         @Override
         public void init(Injector injector) {
-            // Not required here.
+            // Not required here
         }
 
         @Override
         public List<Timer> getTimers() {
-            // Not required here.
             return null;
-        }
-
-        @Override
-        public void setMotionApplier(final MotionApplier motionApplier) {
-            // Not required here
-        }
-
-        @Override
-        public MotionApplier getMotionApplier() {
-            // Not required here.
-            return null;
-        }
-
-        @Override
-        public void undoUpdate() {
-            // Not required here
         }
     }
 
@@ -184,7 +202,7 @@ class CollisionDelegateTest {
 
         @Override
         public void remove() {
-            // Not required here.
+            // Not required here
         }
 
         @Override
@@ -194,7 +212,7 @@ class CollisionDelegateTest {
 
         @Override
         public void setAnchorPoint(AnchorPoint anchorPoint) {
-            // Not required here.
+            // Not required here
         }
 
         @Override
@@ -204,28 +222,17 @@ class CollisionDelegateTest {
 
         @Override
         public void transferCoordinatesToNode() {
-            // Not required here.
+            // Not required here
         }
 
         @Override
         public void init(Injector injector) {
-            // Not required here.
-        }
-
-        @Override
-        public double getDirection() {
-            return 0;
-        }
-
-        @Override
-        public double getSpeed() {
-            return 0;
+            // Not required here
         }
 
         @Override
         public List<Timer> getTimers() {
             return null;
-            // Not required here.
         }
     }
 }

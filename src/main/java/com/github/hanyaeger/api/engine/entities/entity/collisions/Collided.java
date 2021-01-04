@@ -3,7 +3,6 @@ package com.github.hanyaeger.api.engine.entities.entity.collisions;
 import com.github.hanyaeger.api.engine.entities.entity.motion.Rotatable;
 import com.github.hanyaeger.api.engine.entities.entity.YaegerEntity;
 import com.github.hanyaeger.api.engine.entities.entity.Bounded;
-import com.github.hanyaeger.api.engine.entities.entity.motion.Moveable;
 import com.github.hanyaeger.api.engine.scenes.YaegerScene;
 
 import java.util.List;
@@ -25,23 +24,18 @@ import java.util.Set;
  * the {@link Collided} or {@link Collider} interfaces.
  * </p>
  */
-public interface Collided extends Bounded, Moveable {
+public interface Collided extends Bounded {
 
     /**
      * This method is called if a collision has occurred.
      *
-     * @param collidingObject the EntityCollection you are colliding with
+     * @param collidingObject the {@link Collider} you are colliding with
      */
     void onCollision(final Collider collidingObject);
 
     /**
      * Perform collision detection with a {@link Set} of {@link Collider} instances. Only the first collision
      * is detected.
-     * <p>
-     * In case of a collision, the event handler {@link #onCollision(Collider)} and {@link #undoUpdate()} are
-     * called. From the {@link #onCollision(Collider)} event handler, it is possible that the speed of the Entity
-     * is set to 0. Because the Entity has already been relocated, this relocation should be undone to keep the Entity
-     * at the same location. Hence {@link #undoUpdate()} is called, which is responsible for undoing the last relocation.
      * <p>
      * Note that all of this takes place during the same Game World update. The re-rendering takes place after this update
      * completes, meaning the undoing will cause no jitter effect.
@@ -56,13 +50,12 @@ public interface Collided extends Bounded, Moveable {
         for (final Collider collider : colliders) {
             if (hasCollidedWith(collider)) {
                 onCollision(collider);
-                undoUpdate();
                 break;
             }
         }
     }
 
     private boolean hasCollidedWith(final Collider collider) {
-        return !this.equals(collider) && getBoundsInScene().intersects(collider.getBoundsInScene());
+        return !this.equals(collider) && getBoundingBox().intersects(collider.getBoundingBox());
     }
 }

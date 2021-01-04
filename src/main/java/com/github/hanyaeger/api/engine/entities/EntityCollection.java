@@ -2,6 +2,7 @@ package com.github.hanyaeger.api.engine.entities;
 
 import com.github.hanyaeger.api.engine.Initializable;
 import com.github.hanyaeger.api.engine.Updatable;
+import com.github.hanyaeger.api.engine.YaegerConfig;
 import com.github.hanyaeger.api.engine.annotations.AnnotationProcessor;
 import com.github.hanyaeger.api.engine.debug.StatisticsObserver;
 import com.github.hanyaeger.api.engine.entities.entity.Removeable;
@@ -31,6 +32,7 @@ public class EntityCollection implements Initializable {
     private final EntityCollectionStatistics statistics;
     private Injector injector;
     private final Pane pane;
+    private final EntitySupplier boundingBoxes = new EntitySupplier();
     private final List<EntitySupplier> suppliers = new ArrayList<>();
     private final List<YaegerEntity> statics = new ArrayList<>();
     private final List<Updatable> updatables = new ArrayList<>();
@@ -41,16 +43,23 @@ public class EntityCollection implements Initializable {
 
     private final CollisionDelegate collisionDelegate;
     private AnnotationProcessor annotationProcessor;
+    private YaegerConfig config;
 
     /**
      * Instantiate an {@link EntityCollection} for a given {@link Group} and a {@link Set} of {@link YaegerEntity} instances.
      *
-     * @param pane The {@link Group} to which all instances of {@link YaegerEntity}s should be added.
+     * @param pane   the {@link Group} to which all instances of {@link YaegerEntity}s should be added
+     * @param config the {@link YaegerConfig} that should be used with this {@link EntityCollection}
      */
-    public EntityCollection(final Pane pane) {
+    public EntityCollection(final Pane pane, final YaegerConfig config) {
         this.pane = pane;
+        this.config = config;
         this.collisionDelegate = new CollisionDelegate();
         this.statistics = new EntityCollectionStatistics();
+
+        if (config.isShowBoundingBox()) {
+            registerSupplier(boundingBoxes);
+        }
     }
 
     /**
@@ -210,8 +219,16 @@ public class EntityCollection implements Initializable {
         entity.applyTranslationsForAnchorPoint();
 
         entity.applyEntityProcessor(this::registerKeylistener);
-        entity.applyEntityProcessor(collisionDelegate::register);
+        entity.applyEntityProcessor(this::registerCollider);
         entity.addToParent(this::addToParentNode);
+    }
+
+    private void registerCollider(final YaegerEntity yaegerEntity) {
+        var collider = collisionDelegate.register(yaegerEntity);
+
+        if (collider && config.isShowBoundingBox()) {
+            boundingBoxes.add(new BoundingBoxVisualizer(yaegerEntity));
+        }
     }
 
     /**

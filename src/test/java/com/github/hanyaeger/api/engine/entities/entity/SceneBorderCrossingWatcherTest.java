@@ -4,6 +4,8 @@ import com.github.hanyaeger.api.engine.Updatable;
 import com.github.hanyaeger.api.engine.entities.entity.motion.MotionApplier;
 import com.github.hanyaeger.api.engine.scenes.SceneBorder;
 import javafx.geometry.BoundingBox;
+import javafx.geometry.Bounds;
+import javafx.geometry.Point2D;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import org.junit.jupiter.api.BeforeEach;
@@ -37,8 +39,6 @@ class SceneBorderCrossingWatcherTest {
 
         sut.setGameNode(node);
         sut.setMotionApplier(motionApplier);
-
-        when(motionApplier.getPreviousLocation()).thenReturn(Optional.of(new Coordinate2D(0, 0)));
     }
 
     @Test
@@ -55,7 +55,7 @@ class SceneBorderCrossingWatcherTest {
     @Test
     void testBoundaryNotCrossed() {
         // Arrange
-        when(node.getBoundsInParent()).thenReturn(BOUNDS_IN_SCENE);
+        when(node.localToScene((Bounds) any(), any(Boolean.class))).thenReturn(BOUNDS_IN_SCENE);
         when(node.getScene()).thenReturn(scene);
         when(scene.getWidth()).thenReturn(SCENE_WIDTH);
         when(scene.getHeight()).thenReturn(SCENE_HEIGHT);
@@ -72,7 +72,7 @@ class SceneBorderCrossingWatcherTest {
     @Test
     void testBoundaryLeftCrossedWithZeroSpeed() {
         // Arrange
-        when(node.getBoundsInParent()).thenReturn(BOUNDS_CROSSED_LEFT);
+        when(node.localToScene((Bounds) any(), any(Boolean.class))).thenReturn(BOUNDS_CROSSED_LEFT);
         when(node.getScene()).thenReturn(scene);
         when(scene.getWidth()).thenReturn(SCENE_WIDTH);
         when(scene.getHeight()).thenReturn(SCENE_HEIGHT);
@@ -91,7 +91,7 @@ class SceneBorderCrossingWatcherTest {
     @Test
     void testBoundaryLeftCrossedWithNonZeroSpeed() {
         // Arrange
-        when(node.getBoundsInParent()).thenReturn(BOUNDS_CROSSED_LEFT);
+        when(node.localToScene((Bounds) any(), any(Boolean.class))).thenReturn(BOUNDS_CROSSED_LEFT);
         when(node.getScene()).thenReturn(scene);
         when(scene.getWidth()).thenReturn(SCENE_WIDTH);
         when(scene.getHeight()).thenReturn(SCENE_HEIGHT);
@@ -110,7 +110,7 @@ class SceneBorderCrossingWatcherTest {
     @Test
     void testBoundaryRightCrossedWithZeroSpeed() {
         // Arrange
-        when(node.getBoundsInParent()).thenReturn(BOUNDS_CROSSED_RIGHT);
+        when(node.localToScene((Bounds) any(), any(Boolean.class))).thenReturn(BOUNDS_CROSSED_RIGHT);
         when(node.getScene()).thenReturn(scene);
         when(scene.getWidth()).thenReturn(SCENE_WIDTH);
         when(scene.getHeight()).thenReturn(SCENE_HEIGHT);
@@ -129,7 +129,7 @@ class SceneBorderCrossingWatcherTest {
     @Test
     void testBoundaryRightCrossedWithNonZeroSpeed() {
         // Arrange
-        when(node.getBoundsInParent()).thenReturn(BOUNDS_CROSSED_RIGHT);
+        when(node.localToScene((Bounds) any(), any(Boolean.class))).thenReturn(BOUNDS_CROSSED_RIGHT);
         when(node.getScene()).thenReturn(scene);
         when(scene.getWidth()).thenReturn(SCENE_WIDTH);
         when(scene.getHeight()).thenReturn(SCENE_HEIGHT);
@@ -148,7 +148,7 @@ class SceneBorderCrossingWatcherTest {
     @Test
     void testBoundaryBottomCrossedWithZeroSpeed() {
         // Arrange
-        when(node.getBoundsInParent()).thenReturn(BOUNDS_CROSSED_BOTTOM);
+        when(node.localToScene((Bounds) any(), any(Boolean.class))).thenReturn(BOUNDS_CROSSED_BOTTOM);
         when(node.getScene()).thenReturn(scene);
         when(scene.getWidth()).thenReturn(SCENE_WIDTH);
         when(scene.getHeight()).thenReturn(SCENE_HEIGHT);
@@ -167,7 +167,7 @@ class SceneBorderCrossingWatcherTest {
     @Test
     void testBoundaryBottomCrossedWithNonZeroSpeed() {
         // Arrange
-        when(node.getBoundsInParent()).thenReturn(BOUNDS_CROSSED_BOTTOM);
+        when(node.localToScene((Bounds) any(), any(Boolean.class))).thenReturn(BOUNDS_CROSSED_BOTTOM);
         when(node.getScene()).thenReturn(scene);
         when(scene.getWidth()).thenReturn(SCENE_WIDTH);
         when(scene.getHeight()).thenReturn(SCENE_HEIGHT);
@@ -186,7 +186,7 @@ class SceneBorderCrossingWatcherTest {
     @Test
     void testBoundaryTopCrossedWithZeroSpeed() {
         // Arrange
-        when(node.getBoundsInParent()).thenReturn(BOUNDS_CROSSED_TOP);
+        when(node.localToScene((Bounds) any(), any(Boolean.class))).thenReturn(BOUNDS_CROSSED_TOP);
         when(node.getScene()).thenReturn(scene);
         when(scene.getWidth()).thenReturn(SCENE_WIDTH);
         when(scene.getHeight()).thenReturn(SCENE_HEIGHT);
@@ -206,7 +206,7 @@ class SceneBorderCrossingWatcherTest {
     @Test
     void testBoundaryTopCrossedWithNonZeroSpeed() {
         // Arrange
-        when(node.getBoundsInParent()).thenReturn(BOUNDS_CROSSED_TOP);
+        when(node.localToScene((Bounds) any(), any(Boolean.class))).thenReturn(BOUNDS_CROSSED_TOP);
         when(node.getScene()).thenReturn(scene);
         when(scene.getWidth()).thenReturn(SCENE_WIDTH);
 
@@ -254,17 +254,17 @@ class SceneBorderCrossingWatcherTest {
 
         @Override
         public void setAnchorLocationX(double x) {
-            // Not required here.
+            // Not required here
         }
 
         @Override
         public void setAnchorLocationY(double y) {
-            // Not required here.
+            // Not required here
         }
 
         @Override
         public void setAnchorLocation(Coordinate2D anchorLocation) {
-            // Not required here.
+            // Not required here
         }
 
         @Override
@@ -274,12 +274,12 @@ class SceneBorderCrossingWatcherTest {
 
         @Override
         public void transferCoordinatesToNode() {
-
+            // Not required here
         }
 
         @Override
         public void setAnchorPoint(AnchorPoint anchorPoint) {
-
+            // Not required here
         }
 
         @Override

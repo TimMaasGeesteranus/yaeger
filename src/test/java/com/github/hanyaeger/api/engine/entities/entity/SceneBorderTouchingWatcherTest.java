@@ -4,6 +4,7 @@ import com.github.hanyaeger.api.engine.Updatable;
 import com.github.hanyaeger.api.engine.entities.entity.motion.MotionApplier;
 import com.github.hanyaeger.api.engine.scenes.SceneBorder;
 import javafx.geometry.BoundingBox;
+import javafx.geometry.Bounds;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import org.junit.jupiter.api.Assertions;
@@ -36,11 +37,8 @@ class SceneBorderTouchingWatcherTest {
         scene = mock(Scene.class);
         motionApplier = mock(MotionApplier.class);
 
-
         sut.setGameNode(node);
         sut.setMotionApplier(motionApplier);
-
-        when(motionApplier.getPreviousLocation()).thenReturn(Optional.of(new Coordinate2D(0, 0)));
     }
 
     @Test
@@ -51,13 +49,13 @@ class SceneBorderTouchingWatcherTest {
         var updatable = sut.watchForBoundaryTouching();
 
         // Assert
-        assertTrue(updatable instanceof Updatable);
+        assertNotNull(updatable);
     }
 
     @Test
     void testBoundaryNotTouched() {
         // Arrange
-        when(node.getBoundsInParent()).thenReturn(BOUNDS_IN_SCENE);
+        when(node.localToScene((Bounds) any(), any(Boolean.class))).thenReturn(BOUNDS_IN_SCENE);
         when(node.getScene()).thenReturn(scene);
         when(scene.getWidth()).thenReturn(SCENE_WIDTH);
         when(scene.getHeight()).thenReturn(SCENE_HEIGHT);
@@ -74,7 +72,7 @@ class SceneBorderTouchingWatcherTest {
     @Test
     void testBoundaryLeftCrossedWithZeroSpeed() {
         // Arrange
-        when(node.getBoundsInParent()).thenReturn(BOUNDS_CROSSED_LEFT);
+        when(node.localToScene((Bounds) any(), any(Boolean.class))).thenReturn(BOUNDS_CROSSED_LEFT);
         when(node.getScene()).thenReturn(scene);
         when(scene.getWidth()).thenReturn(SCENE_WIDTH);
         when(scene.getHeight()).thenReturn(SCENE_HEIGHT);
@@ -93,7 +91,7 @@ class SceneBorderTouchingWatcherTest {
     @Test
     void testBoundaryLeftCrossedWithNonZeroSpeed() {
         // Arrange
-        when(node.getBoundsInParent()).thenReturn(BOUNDS_CROSSED_LEFT);
+        when(node.localToScene((Bounds) any(), any(Boolean.class))).thenReturn(BOUNDS_CROSSED_LEFT);
         when(node.getScene()).thenReturn(scene);
         when(scene.getWidth()).thenReturn(SCENE_WIDTH);
         when(scene.getHeight()).thenReturn(SCENE_HEIGHT);
@@ -112,7 +110,7 @@ class SceneBorderTouchingWatcherTest {
     @Test
     void testBoundaryRightCrossedWithZeroSpeed() {
         // Arrange
-        when(node.getBoundsInParent()).thenReturn(BOUNDS_CROSSED_RIGHT);
+        when(node.localToScene((Bounds) any(), any(Boolean.class))).thenReturn(BOUNDS_CROSSED_RIGHT);
         when(node.getScene()).thenReturn(scene);
         when(scene.getWidth()).thenReturn(SCENE_WIDTH);
         when(scene.getHeight()).thenReturn(SCENE_HEIGHT);
@@ -131,7 +129,7 @@ class SceneBorderTouchingWatcherTest {
     @Test
     void testBoundaryRightCrossedWithNonZeroSpeed() {
         // Arrange
-        when(node.getBoundsInParent()).thenReturn(BOUNDS_CROSSED_RIGHT);
+        when(node.localToScene((Bounds) any(), any(Boolean.class))).thenReturn(BOUNDS_CROSSED_RIGHT);
         when(node.getScene()).thenReturn(scene);
         when(scene.getWidth()).thenReturn(SCENE_WIDTH);
         when(scene.getHeight()).thenReturn(SCENE_HEIGHT);
@@ -150,7 +148,7 @@ class SceneBorderTouchingWatcherTest {
     @Test
     void testBoundaryBottomTouchedWithZeroSpeed() {
         // Arrange
-        when(node.getBoundsInParent()).thenReturn(BOUNDS_CROSSED_BOTTOM);
+        when(node.localToScene((Bounds) any(), any(Boolean.class))).thenReturn(BOUNDS_CROSSED_BOTTOM);
         when(node.getScene()).thenReturn(scene);
         when(scene.getWidth()).thenReturn(SCENE_WIDTH);
         when(scene.getHeight()).thenReturn(SCENE_HEIGHT);
@@ -169,7 +167,7 @@ class SceneBorderTouchingWatcherTest {
     @Test
     void testBoundaryBottomTouchedWithNonZeroSpeed() {
         // Arrange
-        when(node.getBoundsInParent()).thenReturn(BOUNDS_CROSSED_BOTTOM);
+        when(node.localToScene((Bounds) any(), any(Boolean.class))).thenReturn(BOUNDS_CROSSED_BOTTOM);
         when(node.getScene()).thenReturn(scene);
         when(scene.getWidth()).thenReturn(SCENE_WIDTH);
         when(scene.getHeight()).thenReturn(SCENE_HEIGHT);
@@ -188,7 +186,7 @@ class SceneBorderTouchingWatcherTest {
     @Test
     void testBoundaryTopTouchedWithZeroSpeed() {
         // Arrange
-        when(node.getBoundsInParent()).thenReturn(BOUNDS_CROSSED_TOP);
+        when(node.localToScene((Bounds) any(), any(Boolean.class))).thenReturn(BOUNDS_CROSSED_TOP);
         when(node.getScene()).thenReturn(scene);
         when(scene.getWidth()).thenReturn(SCENE_WIDTH);
         when(scene.getHeight()).thenReturn(SCENE_HEIGHT);
@@ -207,7 +205,7 @@ class SceneBorderTouchingWatcherTest {
     @Test
     void testBoundaryTopTouchedWithNonZeroSpeed() {
         // Arrange
-        when(node.getBoundsInParent()).thenReturn(BOUNDS_CROSSED_TOP);
+        when(node.localToScene((Bounds) any(), any(Boolean.class))).thenReturn(BOUNDS_CROSSED_TOP);
         when(node.getScene()).thenReturn(scene);
         when(scene.getWidth()).thenReturn(SCENE_WIDTH);
         when(scene.getHeight()).thenReturn(SCENE_HEIGHT);
@@ -255,33 +253,32 @@ class SceneBorderTouchingWatcherTest {
 
         @Override
         public void setAnchorLocationX(double x) {
-            // Not required here.
+            // Not required here
         }
 
         @Override
         public void setAnchorLocationY(double y) {
-            // Not required here.
+            // Not required here
         }
 
         @Override
         public void setAnchorLocation(Coordinate2D anchorLocation) {
-            // Not required here.
+            // Not required here
         }
 
         @Override
         public Coordinate2D getAnchorLocation() {
-            // Not required here.
             return null;
         }
 
         @Override
         public void transferCoordinatesToNode() {
-            // Not required here.
+            // Not required here
         }
 
         @Override
         public void setAnchorPoint(AnchorPoint anchorPoint) {
-            // Not required here.
+            // Not required here
         }
 
         @Override
