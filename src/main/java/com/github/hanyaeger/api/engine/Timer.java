@@ -13,17 +13,19 @@ public abstract class Timer {
 
     private final long interval;
     private long prevTime = 0;
+    private boolean active = true;
 
     /**
      * Create a new instance of {@link Timer} for the given interval in milliseconds.
      *
-     * @param intervalInMs The interval in milleseconds.
+     * @param intervalInMs the interval in milleseconds
      */
     public Timer(final long intervalInMs) {
         this.interval = intervalInMs * 1_000_000;
     }
 
     protected void handle(final long now) {
+        if (!active) return;
 
         if (prevTime == 0) {
             prevTime = now;
@@ -39,9 +41,23 @@ public abstract class Timer {
     }
 
     /**
+     * Pause the timer so it will no longer update with each animation.
+     */
+    public final void pause() {
+        active = false;
+    }
+
+    /**
+     * Resume the timer so it will start updating on each animation again.
+     */
+    public final void resume() {
+        active = true;
+    }
+
+    /**
      * Implement this method, which will be called each animation update with the given interval.
      *
-     * @param timestamp The timestamp of the current frame given in nanoseconds.
+     * @param timestamp the timestamp of the current frame given in nanoseconds
      */
     public abstract void onAnimationUpdate(final long timestamp);
 }
